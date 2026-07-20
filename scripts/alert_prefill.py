@@ -2,7 +2,7 @@
 """
 Hermes WebUI prefill hook: load incident JSON when user opens ?incident=<id>.
 
-Reads /data/incidents/<id>.json (same store as homelab-alert-bridge) or fetches
+Reads /data/incidents/<id>.json (same store as Hearth) or fetches
 from the in-cluster bridge API when INCIDENT_API_BASE is set.
 """
 
@@ -17,17 +17,17 @@ from pathlib import Path
 INCIDENT_DIR = Path(os.environ.get("INCIDENT_DIR", "/data/incidents"))
 INCIDENT_API_BASE = os.environ.get(
     "INCIDENT_API_BASE",
-    "http://homelab-alert-bridge.observability.svc.cluster.local:8000/homelab/api/incidents",
+    "http://hearth.observability.svc.cluster.local:8000/homelab/api/incidents",
 )
 PENDING_ID_FILE = Path(os.environ.get("PENDING_INCIDENT_FILE", "/data/incidents/.pending_incident"))
 PENDING_INCIDENT_API = os.environ.get(
     "PENDING_INCIDENT_API",
-    "http://homelab-alert-bridge.observability.svc.cluster.local:8000/homelab/api/pending-incident",
+    "http://hearth.observability.svc.cluster.local:8000/homelab/api/pending-incident",
 )
 
 
 def _fetch_pending_incident_id() -> str:
-    """One-shot pending id set by WebUI alert-handoff via homelab-alert-bridge."""
+    """One-shot pending id set by WebUI alert-handoff via Hearth."""
     url = PENDING_INCIDENT_API.rstrip("/")
     try:
         with urllib.request.urlopen(url, timeout=3) as resp:
