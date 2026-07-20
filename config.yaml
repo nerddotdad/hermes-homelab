@@ -20,9 +20,22 @@ terminal:
     - HOMELAB_GRAFANA_URL
     - SEARXNG_URL
     - HERMES_HOME
+    - HEARTH_SANDBOX_AGENT_API_KEY
+    - HEARTH_MCP_URL
 
 browser:
   allow_private_urls: true
+
+# Agent attach to Hearth sandbox MCP (ensure-homelab-config.py sets Authorization from env).
+mcp_servers:
+  hearth:
+    url: http://hearth.observability.svc.cluster.local:8000/mcp
+    timeout: 180
+    tools:
+      include:
+        - sandbox_exec
+        - sandbox_status
+        - sandbox_ensure
 
 platforms:
   webhook:

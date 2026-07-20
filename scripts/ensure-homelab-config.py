@@ -25,6 +25,8 @@ ENV_PASSTHROUGH = [
     "HOMELAB_GRAFANA_URL",
     "SEARXNG_URL",
     "HERMES_HOME",
+    "HEARTH_SANDBOX_AGENT_API_KEY",
+    "HEARTH_MCP_URL",
 ]
 
 
@@ -54,6 +56,24 @@ def main() -> None:
         terminal = {}
         cfg["terminal"] = terminal
     terminal["env_passthrough"] = ENV_PASSTHROUGH
+
+    # Point Hermes MCP client at Hearth sandbox (LLM-agnostic triage tools).
+    mcp_url = os.environ.get("HEARTH_MCP_URL", "").strip() or "http://hearth.observability.svc.cluster.local:8000/mcp"
+    api_key = os.environ.get("HEARTH_SANDBOX_AGENT_API_KEY", "").strip()
+    mcp_servers = cfg.setdefault("mcp_servers", {})
+    if not isinstance(mcp_servers, dict):
+        mcp_servers = {}
+        cfg["mcp_servers"] = mcp_servers
+    hearth_mcp = {
+        "url": mcp_url,
+        "timeout": 180,
+        "tools": {
+            "include": ["sandbox_exec", "sandbox_status", "sandbox_ensure"],
+        },
+    }
+    if api_key:
+        hearth_mcp["headers"] = {"Authorization": f"Bearer {api_key}"}
+    mcp_servers["hearth"] = hearth_mcp
 
     browser = cfg.setdefault("browser", {})
     if not isinstance(browser, dict):

@@ -59,6 +59,7 @@ RUN mkdir -p "${UV_CACHE_DIR}" \
 
 # SOUL, skills, profiles, and model config live on the hermes-data PVC (not baked in image).
 COPY scripts /opt/homelab-scripts/
+COPY skills /opt/homelab-skills/
 
 # Seed Ollama provider when config.yaml does not exist yet (PVC first boot).
 COPY config.yaml /opt/hermes-seed/config.yaml
@@ -74,6 +75,15 @@ RUN chmod 755 /opt/homelab-scripts/start-gateway.sh \
   'if [ -f /opt/hermes-seed/config.yaml ] && [ ! -f /home/hermeswebui/.hermes/config.yaml ]; then' \
   '  mkdir -p /home/hermeswebui/.hermes' \
   '  cp /opt/hermes-seed/config.yaml /home/hermeswebui/.hermes/config.yaml' \
+  'fi' \
+  'if [ -d /opt/homelab-skills ]; then' \
+  '  mkdir -p /home/hermeswebui/.hermes/skills' \
+  '  for d in /opt/homelab-skills/*/; do' \
+  '    name=$(basename "$d")' \
+  '    if [ ! -d "/home/hermeswebui/.hermes/skills/$name" ]; then' \
+  '      cp -a "$d" "/home/hermeswebui/.hermes/skills/$name"' \
+  '    fi' \
+  '  done' \
   'fi' \
   'if [ ! -e /home/hermeswebui/.hermes/hermes-agent ] && [ -f /opt/hermes/run_agent.py ]; then' \
   '  ln -sfn /opt/hermes /home/hermeswebui/.hermes/hermes-agent' \
