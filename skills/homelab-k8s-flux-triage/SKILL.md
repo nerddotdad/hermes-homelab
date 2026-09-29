@@ -34,6 +34,12 @@ sandbox_exec incident_id=<id> command="kubectl -n flux-system get kustomizations
 3. Use `HOMELAB_DOCS_BASE_URL` / runbook links from the alert when present.
 4. Local Hermes `terminal` is OK for non-cluster tasks; for kubectl/flux use **sandbox_exec**.
 
+## VolSync cacheCapacity
+
+Increasing `persistence.*.volsync[].src.cacheCapacity` on a TrueCharts HelmRelease is a normal Git update. Flux applies it. Longhorn on this cluster allows volume expansion, and the existing `volsync-src-*-cache` PVC expands in place. Do not tell the operator to delete that cache PVC.
+
+Confirmed 2026-09-29 on Jellyfin: `10Gi` → `40Gi` through Helm release `media/jellyfin.v417`. The cache claim capacity became `40Gi` and the restic mover finished successfully.
+
 ## Typical flow
 
 1. `sandbox_ensure` for the incident
